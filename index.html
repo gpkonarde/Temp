@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pose Detection</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <video id="webcam" width="640" height="480" autoplay></video>
+    <canvas id="canvas"></canvas>
+
+    <!-- Grouped Controls -->
+    <div id="controlsContainer">
+      <div id="infoContainer" class="hidden">
+        <h2>Detected Objects:</h2>
+        <ul id="detectedObjectsList"></ul>
+      </div>
+      <button id="captureBtn">Capture</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

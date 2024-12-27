@@ -1,0 +1,111 @@
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: black;
+  flex-direction: column;
+}
+
+#webcam {
+  display: none;
+}
+
+canvas {
+  border: 1px solid white;
+  width: 90%; /* Default width for smaller screens */
+  height: auto; /* Maintain aspect ratio */
+  position: relative;
+  display: block;
+}
+
+/* Controls container for buttons and info */
+#controlsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: absolute;
+  bottom: 5%;
+  width: 90%; /* Occupy most of the screen width for small devices */
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+#captureBtn {
+  padding: 12px 20px;
+  background-color: green;
+  color: white;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%; /* Full-width button for small screens */
+}
+
+#captureBtn:hover {
+  background-color: darkgreen;
+}
+
+#infoContainer {
+  max-height: 150px; /* Adjust height for better alignment */
+  overflow-y: auto;
+  color: white;
+  margin: 10px 0;
+  width: 100%; /* Responsive width for smaller screens */
+  text-align: center;
+}
+
+#infoContainer ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Media Query: For tablets and medium-sized screens */
+@media (min-width: 768px) {
+  canvas {
+    width: 70%; /* Larger canvas for tablets */
+  }
+
+  #controlsContainer {
+    width: 70%; /* More compact controls for tablets */
+    padding: 20px;
+  }
+
+  #captureBtn {
+    font-size: 16px;
+  }
+
+  #infoContainer {
+    max-height: 200px;
+  }
+}
+
+/* Media Query: For larger screens and desktops */
+@media (min-width: 1024px) {
+  canvas {
+    width: 50%; /* More compact for desktops */
+  }
+
+  #controlsContainer {
+    width: 50%;
+    padding: 25px;
+  }
+
+  #captureBtn {
+    font-size: 18px;
+  }
+
+  #infoContainer {
+    max-height: 300px;
+  }
+}
