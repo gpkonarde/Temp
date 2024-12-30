@@ -13,14 +13,19 @@
     <!-- Grouped Controls -->
     <div id="controlsContainer">
       <div id="infoContainer" class="hidden">
-        <h2>Detected Objects:</h2>
+        <h2>Detected Object List:</h2>
         <ul id="detectedObjectsList"></ul>
+      </div>
+      <div id="messagesContainer">
+        <h2>Messages:</h2>
+        <ul id="messagesList"></ul>
       </div>
       <button id="captureBtn">Capture</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
     <script src="script.js"></script>
   </body>
 </html>
