@@ -51,7 +51,7 @@ async function startRecording() {
 
 // Main function to set up the camera and load the model
 async function main() {
-  await loadMoveNet();
+  await loadBlazePose();
 }
 
 // Setup the camera stream
@@ -68,11 +68,16 @@ async function setupCamera() {
 }
 
 // Load MoveNet model
-async function loadMoveNet() {
+async function loadBlazePose() {
   detector = await poseDetection.createDetector(
-    poseDetection.SupportedModels.MoveNet
+    poseDetection.SupportedModels.BlazePose,
+    {
+      runtime: "mediapipe",
+      solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/pose",
+      modelType: "full",
+    }
   );
-  console.log("MoveNet model loaded successfully");
+  console.log("BlazePose model loaded successfully");
   await setupCamera(); // Start the camera once the model is loaded
   video.play();
   video.style.display = "none";
@@ -85,12 +90,20 @@ async function loadMoveNet() {
 
 // Detect pose and update the canvas with keypoints and skeleton
 async function detectPose() {
-  const poses = await detector.estimatePoses(video);
+  const poses = await detector.estimatePoses(video, {
+    flipHorizontal: false,
+    maxPoses: 1,
+    scoreThreshold: 0.5,
+    minPoseScore: 0.5,
+    minPartScore: 0.5,
+  });
+
   if (poses.length > 0) {
     const keypoints = poses[0].keypoints;
     drawKeypoints(keypoints); // Draw keypoints and skeleton on the canvas
     analyzeHandPositions(keypoints, video); // Analyze hand positions for clapping
   }
+
   requestAnimationFrame(detectPose);
 }
 
@@ -101,10 +114,14 @@ function drawKeypoints(keypoints) {
 
   keypoints.forEach((keypoint) => {
     if (keypoint.score > 0.5) {
-      const { x, y } = keypoint;
+      const { x, y, z } = keypoint;
+
+      // Adjust size based on z coordinate (depth)
+      const size = Math.max(5 - z / 1000000, 1); // Example scaling for visibility
+
       ctx.beginPath();
-      ctx.arc(x, y, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = "red";
+      ctx.arc(x, y, size, 0, 2 * Math.PI);
+      ctx.fillStyle = "red"; // Color can also be adjusted based on z
       ctx.fill();
     }
   });
@@ -115,17 +132,16 @@ function drawKeypoints(keypoints) {
 // Draw skeleton from the keypoints
 function drawSkeleton(keypoints) {
   const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(
-    poseDetection.SupportedModels.MoveNet
+    poseDetection.SupportedModels.BlazePose // Adjusted to use BlazePose
   );
   adjacentKeyPoints.forEach(([i, j]) => {
     const kp1 = keypoints[i];
     const kp2 = keypoints[j];
-
     if (kp1.score > 0.5 && kp2.score > 0.5) {
       ctx.beginPath();
       ctx.moveTo(kp1.x, kp1.y);
       ctx.lineTo(kp2.x, kp2.y);
-      ctx.strokeStyle = "orange";
+      ctx.strokeStyle = "blue"; // Skeleton color
       ctx.lineWidth = 2;
       ctx.stroke();
     }
@@ -134,35 +150,34 @@ function drawSkeleton(keypoints) {
 
 function drawRecKeyPoints(keypoints) {
   rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
-  // rCtx.drawImage(video, 0, 0, rCanvas.width, rCanvas.height);
 
   keypoints.forEach((keypoint) => {
     if (keypoint.score > 0.5) {
-      const { x, y } = keypoint;
+      const { x, y, z } = keypoint;
+
+      const size = Math.max(5 - z / 1000000, 1);
+
       rCtx.beginPath();
-      rCtx.arc(x, y, 5, 0, 2 * Math.PI);
-      rCtx.fillStyle = "red";
+      rCtx.arc(x, y, size, 0, 2 * Math.PI);
+      rCtx.fillStyle = "red"; // Color can also be adjusted based on z
       rCtx.fill();
     }
   });
-
-  drwaRecSkeleton(keypoints);
+  drawRecSkeleton(keypoints);
 }
 
-function drwaRecSkeleton(keypoints) {
+function drawRecSkeleton(keypoints) {
   const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(
-    poseDetection.SupportedModels.MoveNet
+    poseDetection.SupportedModels.BlazePose // Adjusted to use BlazePose
   );
-
   adjacentKeyPoints.forEach(([i, j]) => {
     const kp1 = keypoints[i];
     const kp2 = keypoints[j];
-
     if (kp1.score > 0.5 && kp2.score > 0.5) {
       rCtx.beginPath();
       rCtx.moveTo(kp1.x, kp1.y);
       rCtx.lineTo(kp2.x, kp2.y);
-      rCtx.strokeStyle = "orange";
+      rCtx.strokeStyle = "blue"; // Skeleton color
       rCtx.lineWidth = 2;
       rCtx.stroke();
     }
