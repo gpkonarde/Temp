@@ -10,6 +10,8 @@
     <video id="webcam" width="640" height="480" autoplay></video>
     <canvas id="canvas"></canvas>
 
+    <canvas id="recordedCanvas"></canvas>
+
     <!-- Grouped Controls -->
     <div id="controlsContainer">
       <div id="infoContainer" class="hidden">
@@ -21,6 +23,7 @@
         <ul id="messagesList"></ul>
       </div>
       <button id="captureBtn">Capture</button>
+      <button id="recordBtn">Start Recording</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>

@@ -1,6 +1,8 @@
 const video = document.getElementById("webcam");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const rCanvas = document.getElementById("recordedCanvas");
+const rCtx = recordedCanvas.getContext("2d");
 const captureButton = document.getElementById("captureBtn"); // Capture button
 const infoContainer = document.getElementById("infoContainer"); // Info container to show detected objects
 const detectedObjectsList = document.getElementById("detectedObjectsList");
@@ -9,6 +11,43 @@ const messagesContainer = document.getElementById("messagesContainer");
 let detector;
 let lastDistance = Infinity; // Initialize last distance as a large value
 let clapThreshold = 150; // Distance threshold for detecting a clap
+let isRecording = false; // State to check if recording is active
+let recordedKeypoints = []; // Array to store recorded keypoints
+let playbackInterval;
+const recordButton = document.getElementById("recordBtn"); // Record button
+
+recordButton.addEventListener("click", async () => {
+  if (!isRecording) {
+    // Start recording
+    isRecording = true;
+    recordedKeypoints = []; // Clear previous recordings
+    recordButton.textContent = "Stop Recording";
+    console.log("Recording started...");
+
+    // Start a loop to continuously capture keypoints while recording
+    await startRecording();
+  } else {
+    // Stop recording
+    isRecording = false;
+    recordButton.textContent = "Start Recording";
+    console.log("Recording stopped...");
+  }
+});
+
+// Function to continuously capture keypoints while recording
+async function startRecording() {
+  const startTime = Date.now();
+  while (isRecording) {
+    const poses = await detector.estimatePoses(video);
+
+    if (poses.length > 0) {
+      const keypoints = poses[0].keypoints;
+      const timeStamp = Date.now() - startTime;
+      recordedKeypoints.push({ keypoints, timeStamp }); // Store keypoints in the array
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Adjust the delay as needed (100ms here)
+  }
+}
 
 // Main function to set up the camera and load the model
 async function main() {
@@ -39,6 +78,8 @@ async function loadMoveNet() {
   video.style.display = "none";
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
+  rCanvas.width = video.videoWidth;
+  rCanvas.height = video.videoHeight;
   detectPose(); // Start detecting poses
 }
 
@@ -76,7 +117,6 @@ function drawSkeleton(keypoints) {
   const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(
     poseDetection.SupportedModels.MoveNet
   );
-
   adjacentKeyPoints.forEach(([i, j]) => {
     const kp1 = keypoints[i];
     const kp2 = keypoints[j];
@@ -92,12 +132,84 @@ function drawSkeleton(keypoints) {
   });
 }
 
+function drawRecKeyPoints(keypoints) {
+  rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+  // rCtx.drawImage(video, 0, 0, rCanvas.width, rCanvas.height);
+
+  keypoints.forEach((keypoint) => {
+    if (keypoint.score > 0.5) {
+      const { x, y } = keypoint;
+      rCtx.beginPath();
+      rCtx.arc(x, y, 5, 0, 2 * Math.PI);
+      rCtx.fillStyle = "red";
+      rCtx.fill();
+    }
+  });
+
+  drwaRecSkeleton(keypoints);
+}
+
+function drwaRecSkeleton(keypoints) {
+  const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(
+    poseDetection.SupportedModels.MoveNet
+  );
+
+  adjacentKeyPoints.forEach(([i, j]) => {
+    const kp1 = keypoints[i];
+    const kp2 = keypoints[j];
+
+    if (kp1.score > 0.5 && kp2.score > 0.5) {
+      rCtx.beginPath();
+      rCtx.moveTo(kp1.x, kp1.y);
+      rCtx.lineTo(kp2.x, kp2.y);
+      rCtx.strokeStyle = "orange";
+      rCtx.lineWidth = 2;
+      rCtx.stroke();
+    }
+  });
+}
+
+function playBackRecording() {
+  if (recordedKeypoints.length == 0) {
+    alert("No recording avalaible to play back !");
+    return;
+  }
+
+  let currentIndex = 0;
+  const startTime = Date.now();
+
+  rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+
+  playbackInterval = setInterval(() => {
+    const elapsedTime = Date.now() - startTime;
+
+    while (
+      currentIndex < recordedKeypoints.length &&
+      recordedKeypoints[currentIndex].timeStamp <= elapsedTime
+    ) {
+      const { keypoints } = recordedKeypoints[currentIndex];
+      drawRecKeyPoints(keypoints);
+      currentIndex++;
+    }
+
+    if (currentIndex >= recordedKeypoints.length) {
+      clearInterval(playbackInterval);
+      console.log("Playback finished.");
+    }
+  }, 100);
+}
+
 // Capture keypoints and display in the info container
 captureButton.addEventListener("click", async () => {
   const poses = await detector.estimatePoses(video);
   if (poses.length > 0) {
     displayKeypoints(poses[0].keypoints);
     infoContainer.style.display = "block"; // Show the info container
+    messagesContainer.style.display = "block"; // Show the info container
+
+    setTimeout(() => {
+      messagesContainer.style.display = "none";
+    }, 2000);
   }
 });
 
@@ -194,5 +306,10 @@ function checkForClap(currentDistance) {
 function determineAction([shoulder, wrist]) {
   return wrist.y < shoulder.y; // Return true if hand is above shoulder
 }
+
+const playbackButton = document.createElement("button");
+playbackButton.textContent = "Play Back Recording";
+playbackButton.addEventListener("click", playBackRecording);
+document.body.appendChild(playbackButton);
 
 main(); // Call the main function to start the app

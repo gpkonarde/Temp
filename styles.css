@@ -14,12 +14,19 @@ body {
 }
 
 canvas {
-  border: 1px solid white;
+  border: 1px solid white; /* Main canvas border */
   width: 90%; /* Default width for smaller screens */
   height: auto; /* Maintain aspect ratio */
   position: relative;
 }
 
+#recordedCanvas {
+  border: 2px solid rgb(255, 165, 0); /* Orange border for visibility */
+  width: 90%; /* Default width for smaller screens */
+  height: auto; /* Maintain aspect ratio */
+}
+
+/* Controls container for buttons and info */
 #controlsContainer {
   display: flex;
   flex-direction: column;
@@ -33,7 +40,8 @@ canvas {
   border-radius: 10px;
 }
 
-#captureBtn {
+#captureBtn,
+#recordBtn {
   padding: 12px 20px;
   background-color: green;
   color: white;
@@ -42,7 +50,8 @@ canvas {
   border-radius: 5px;
 }
 
-#captureBtn:hover {
+#captureBtn:hover,
+#recordBtn:hover {
   background-color: darkgreen;
 }
 
@@ -73,8 +82,11 @@ canvas {
 
 /* Media Query for responsive design */
 @media (min-width: 768px) {
-  canvas {
-    width: 70%;
+  canvas,
+  #recordedCanvas {
+    width: 90%;
+    height: auto;
+    border: 2px solid black; /* Consistent border style on larger screens */
   }
   #controlsContainer {
     width: 70%;
