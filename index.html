@@ -7,10 +7,14 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- Main Video Feed (Hidden) -->
     <video id="webcam" width="640" height="480" autoplay></video>
+
+    <!-- Main Canvas for Drawing -->
     <canvas id="canvas"></canvas>
 
-    <canvas id="recordedCanvas"></canvas>
+    <!-- Playback Canvas for Recorded Content -->
+    <canvas id="recordedCanvas" class="hidden"></canvas>
 
     <!-- Grouped Controls -->
     <div id="controlsContainer">
@@ -23,6 +27,7 @@
         <ul id="messagesList"></ul>
       </div>
       <button id="captureBtn">Capture</button>
+      <button id="playbackBtn">Playback</button>
       <button id="recordBtn">Start Recording</button>
     </div>
 
