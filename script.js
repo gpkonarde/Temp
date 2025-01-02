@@ -7,6 +7,7 @@ const captureButton = document.getElementById("captureBtn"); // Capture button
 const infoContainer = document.getElementById("infoContainer"); // Info container to show detected objects
 const detectedObjectsList = document.getElementById("detectedObjectsList");
 const messagesContainer = document.getElementById("messagesContainer");
+const btnGrid = document.getElementById("btnGrid");
 
 let detector;
 let lastDistance = Infinity; // Initialize last distance as a large value
@@ -209,9 +210,13 @@ function playBackRecording() {
 
     if (currentIndex >= recordedKeypoints.length) {
       clearInterval(playbackInterval);
+      canvas.style.display = "block";
+      rCanvas.style.display = "none";
       console.log("Playback finished.");
     }
   }, 100);
+
+  console.log(playbackInterval);
 }
 
 // Capture keypoints and display in the info container
@@ -219,9 +224,7 @@ captureButton.addEventListener("click", async () => {
   const poses = await detector.estimatePoses(video);
   if (poses.length > 0) {
     displayKeypoints(poses[0].keypoints);
-    infoContainer.style.display = "block"; // Show the info container
-    messagesContainer.style.display = "block"; // Show the info container
-
+    messagesContainer.style.display = "block";
     setTimeout(() => {
       messagesContainer.style.display = "none";
     }, 2000);
@@ -323,8 +326,15 @@ function determineAction([shoulder, wrist]) {
 }
 
 const playbackButton = document.createElement("button");
-playbackButton.textContent = "Play Back Recording";
+playbackButton.textContent = "PlayBack";
 playbackButton.addEventListener("click", playBackRecording);
-document.body.appendChild(playbackButton);
+btnGrid.appendChild(playbackButton);
+
+playbackButton.addEventListener("click", () => {
+  setTimeout(() => {
+    canvas.style.display = "none";
+    rCanvas.style.display = "block";
+  }, playbackInterval);
+});
 
 main(); // Call the main function to start the app

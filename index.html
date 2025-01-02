@@ -7,28 +7,25 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Main Video Feed (Hidden) -->
-    <video id="webcam" width="640" height="480" autoplay></video>
+    <div id="MainScreen">
+      <video id="webcam" width="640" height="480" autoplay></video>
+      <canvas id="canvas"></canvas>
+      <canvas style="display: none" id="recordedCanvas"></canvas>
+    </div>
 
-    <!-- Main Canvas for Drawing -->
-    <canvas id="canvas"></canvas>
-
-    <!-- Playback Canvas for Recorded Content -->
-    <canvas id="recordedCanvas" class="hidden"></canvas>
-
-    <!-- Grouped Controls -->
     <div id="controlsContainer">
       <div id="infoContainer" class="hidden">
         <h2>Detected Object List:</h2>
         <ul id="detectedObjectsList"></ul>
       </div>
-      <div id="messagesContainer">
+      <div id="messagesContainer" hidden>
         <h2>Messages:</h2>
         <ul id="messagesList"></ul>
       </div>
-      <button id="captureBtn">Capture</button>
-      <button id="playbackBtn">Playback</button>
-      <button id="recordBtn">Start Recording</button>
+      <div class="btnGrid" id="btnGrid">
+        <button id="captureBtn">Capture</button>
+        <button id="recordBtn">Start Recording</button>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>

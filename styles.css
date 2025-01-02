@@ -9,6 +9,10 @@ body {
   flex-direction: column;
 }
 
+#MainScreen {
+  position: relative; /* Position relative for absolute positioning of children */
+}
+
 #webcam {
   display: none; /* Hide webcam video feed */
 }
@@ -19,11 +23,17 @@ canvas {
   height: auto; /* Maintain aspect ratio */
   position: relative;
 }
-
+.hide {
+  display: none;
+}
 #recordedCanvas {
   border: 2px solid rgb(255, 165, 0); /* Orange border for visibility */
   width: 90%; /* Default width for smaller screens */
   height: auto; /* Maintain aspect ratio */
+}
+
+.hidden {
+  display: none; /* Hide elements when not needed */
 }
 
 /* Controls container for buttons and info */
@@ -40,8 +50,15 @@ canvas {
   border-radius: 10px;
 }
 
+/* Button Grid Styles */
+.btnGrid {
+  display: flex; /* Use flexbox for button alignment */
+  gap: 10px; /* Space between buttons */
+}
+
 #captureBtn,
-#recordBtn {
+#recordBtn,
+#playbackBtn {
   padding: 12px 20px;
   background-color: green;
   color: white;
@@ -51,22 +68,31 @@ canvas {
 }
 
 #captureBtn:hover,
-#recordBtn:hover {
+#recordBtn:hover,
+#playbackBtn:hover {
   background-color: darkgreen;
 }
 
-#infoContainer {
-  max-height: 150px; /* Adjust height for better alignment */
-  overflow-y: auto; /* Enable vertical scrolling */
-  color: white;
-}
-
+/* Info and Messages Container Styles */
+#infoContainer,
 #messagesContainer {
   max-height: 150px; /* Adjust height for better alignment */
   overflow-y: auto; /* Enable vertical scrolling */
   color: white;
-  width: 100%; /* Responsive width for smaller screens */
-  text-align: center;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.1
+  ); /* Light background for contrast */
+  padding: 10px; /* Padding for better spacing */
+  border-radius: 5px; /* Rounded corners */
+  width: calc(100% - 20px); /* Full width minus padding */
+}
+
+#infoContainer h2,
+#messagesContainer h2 {
+  margin-bottom: 5px; /* Space below headings */
 }
 
 #infoContainer ul,
@@ -76,20 +102,22 @@ canvas {
   list-style: none;
 }
 
-.hidden {
-  display: none; /* Hide the info container when not needed */
-}
-
 /* Media Query for responsive design */
 @media (min-width: 768px) {
   canvas,
   #recordedCanvas {
-    width: 90%;
+    width: calc(
+      90% - (2 * var(--border-width))
+    ); /* Adjust width based on border */
     height: auto;
-    border: 2px solid black; /* Consistent border style on larger screens */
+    border: var(--border-width) solid black; /* Consistent border style on larger screens */
   }
   #controlsContainer {
-    width: 70%;
-    padding: 20px;
+    width: calc(
+      70% - (2 * var(--border-width))
+    ); /* Adjust width based on border */
+    padding: calc(
+      20px - var(--padding-adjust)
+    ); /* Adjust padding based on screen size */
   }
 }
