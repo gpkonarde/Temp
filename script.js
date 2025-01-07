@@ -9,7 +9,7 @@ const detectedObjectsList = document.getElementById("detectedObjectsList");
 const messagesContainer = document.getElementById("messagesContainer");
 const btnGrid = document.getElementById("btnGrid");
 
-let detector;
+let points = [];
 let lastDistance = Infinity; // Initialize last distance as a large value
 let clapThreshold = 150; // Distance threshold for detecting a clap
 let isRecording = false; // State to check if recording is active
@@ -48,6 +48,7 @@ async function startRecording() {
     }
     await new Promise((resolve) => setTimeout(resolve, 100)); // Adjust the delay as needed (100ms here)
   }
+  saveJson({ frames: recordedKeypoints });
 }
 
 // Main function to set up the camera and load the model
@@ -98,7 +99,6 @@ async function detectPose() {
     minPoseScore: 0.5,
     minPartScore: 0.5,
   });
-
   if (poses.length > 0) {
     const keypoints = poses[0].keypoints;
     drawKeypoints(keypoints); // Draw keypoints and skeleton on the canvas
@@ -223,6 +223,7 @@ function playBackRecording() {
 captureButton.addEventListener("click", async () => {
   const poses = await detector.estimatePoses(video);
   if (poses.length > 0) {
+    console.log(poses[0].keypoints);
     displayKeypoints(poses[0].keypoints);
     messagesContainer.style.display = "block";
     setTimeout(() => {
@@ -336,5 +337,20 @@ playbackButton.addEventListener("click", () => {
     rCanvas.style.display = "block";
   }, playbackInterval);
 });
+
+function saveJson(data) {
+  const jsonData = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonData], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  // Create a temporary download link
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "data.json";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link); // Clean up
+  URL.revokeObjectURL(url);
+}
 
 main(); // Call the main function to start the app
